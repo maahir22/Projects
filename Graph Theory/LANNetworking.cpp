@@ -1,6 +1,24 @@
 #include<bits/stdc++.h>
 using namespace std;
 vector<tuple<int,int,int>> ngraph;
+vector<bool> vis(10000,false);
+stack<int> st;
+int tc=0;
+string ans="";
+void dfs(int src,vector<int> graph[],bool isecond=false){
+    if(isecond){
+        tc++;
+    } 
+       ans+=to_string(src)+" ";
+       vis[src]=true;
+    for(int i=0;i<graph[src].size();i++){
+        if(!vis[graph[src][i]])
+        dfs(graph[src][i],graph,isecond);
+    }
+    if(!isecond){
+    st.push(src);
+    }
+}
 void belford(int src,int n,vector<int> &dis){
     dis[src]=0;
     for(int i=0;i<n;i++){
@@ -14,12 +32,16 @@ void belford(int src,int n,vector<int> &dis){
 int main(){
     int routers,connections;
     cin>>routers>>connections;
+    vector<int> graph[routers+1];
+    //For the first task of making Routing Tables for each node, we assume that the given graph is undirected.
+    //For the second task of finding the Maximal Strongly Connected Sub-Network we have to assume that the graph is directed.
     for(int i=0;i<connections;i++){
         int origin;
         int destination;
         int cost;
         cin>>origin>>destination>>cost;
         ngraph.push_back({origin,destination,cost});
+        graph[origin].push_back(destination);
         ngraph.push_back({destination,origin,cost});
     }
     //Cost or Link is assigned on the basis of desirability of Network Route for sending traffic.
@@ -50,5 +72,40 @@ int main(){
         }
         cout<<endl;
     }
-    
+            cout<<"____________________________________________________"<<endl;
+
+    //Now we go on and find the maximal strongly connected sub-network.
+    //A strongly connected component of a graph is defined as a component in which every node can visit every other node.
+    //To do so we are going to implement KosaRaju Algorithm.
+   for(int i=0;i<n;i++){
+       if(!vis[i]){
+             dfs(i,graph); //First make a normal dfs call to maintain the order of visiting elements in a stack.
+       }
+  }
+  vector<int> revg[n+1];   //Now reverse the given graph and maintain it in another list.
+  for(int i=0;i<n;i++){
+      for(int j=0;j<graph[i].size();j++){
+          revg[graph[i][j]].push_back(i);
+     }
+  }
+  int max_ele=-1e9;
+  string fans="";
+  ans="";
+  for(int i=0;i<n;i++)
+  vis[i]=false;
+    while(st.size()!=0){                          //Call DFS on each member of the elements still maintaing the given order of stack.
+        int rvtx= st.top(); st.pop();
+        if(!vis[rvtx]){
+            ::tc=0;
+        dfs(rvtx,revg,true);
+        if(tc>max_ele){
+        max_ele=tc;
+        fans=ans;
+    }
+       ans="";
+    }
+ }
+  cout<<"Maximal Strongly Connected Sub-Network has "<<max_ele<<" members and the members are : "<<fans<<endl;    
+
 }
+
