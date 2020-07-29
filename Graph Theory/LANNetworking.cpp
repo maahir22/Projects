@@ -1,6 +1,16 @@
 #include<bits/stdc++.h>
 using namespace std;
-vector<tuple<int,int,int>> ngraph;
+struct Edges{
+    int a;
+    int b;
+    int w;
+    Edges(int s,int d, int c){
+        a=s;
+        b=d;
+        w=c;
+    }
+};
+vector<Edges> ngraph;
 vector<bool> vis(10000,false);
 stack<int> st;
 int tc=0;
@@ -24,7 +34,9 @@ void belford(int src,int n,vector<int> &dis){
     for(int i=0;i<n;i++){
         for(auto e: ngraph){
             int src,dest,cost;
-            tie(src,dest,cost)=e;
+            src=e.a;
+            dest=e.b;
+            cost=e.w;
             dis[dest]=min(dis[dest],dis[src]+cost);
         }
     }
@@ -93,19 +105,18 @@ int main(){
   ans="";
   for(int i=0;i<n;i++)
   vis[i]=false;
-    while(st.size()!=0){                          //Call DFS on each member of the elements still maintaing the given order of stack.
-        int rvtx= st.top(); st.pop();
-        if(!vis[rvtx]){
-            ::tc=0;
-        dfs(rvtx,revg,true);
-        if(tc>max_ele){
+  while(st.size()!=0){                          //Call DFS on each member of the elements still maintaing the given order of stack.
+    int rvtx= st.top(); st.pop();
+    if(!vis[rvtx]){
+        ::tc=0;
+    dfs(rvtx,revg,true);
+    if(tc>max_ele){
         max_ele=tc;
         fans=ans;
     }
        ans="";
     }
- }
+  }
   cout<<"Maximal Strongly Connected Sub-Network has "<<max_ele<<" members and the members are : "<<fans<<endl;    
-
+  
 }
-
