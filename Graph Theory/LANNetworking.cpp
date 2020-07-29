@@ -1,9 +1,15 @@
+//Functionalities as of now:
+//1) Setting up Router Networks with Edges
+//2) Calculation of Routing Tables via Bellmann Ford Algorithm in O(N^2);
+//3) Finding the Maximal Strongly Connected Sub Network.
+//4) Handling Link Failiure of between any two network routers with a direct edge.
 #include<bits/stdc++.h>
 using namespace std;
 struct Edges{
-    int a;
-    int b;
-    int w;
+    int a;    //Source
+    int b;    //Destination
+    int w;    //Cost(Favourability)
+
     Edges(int s,int d, int c){
         a=s;
         b=d;
@@ -29,6 +35,18 @@ void dfs(int src,vector<int> graph[],bool isecond=false){
     st.push(src);
     }
 }
+void removeEdge(int u, int v)
+{
+    for(int j=0;j<ngraph.size();j++){
+        if(ngraph[j].a==u && ngraph[j].b==v){
+            ngraph.erase(ngraph.begin()+j);
+        }
+        if(ngraph[j].a==v && ngraph[j].b==v){
+            ngraph.erase(ngraph.begin()+j);
+        }
+    }
+}
+
 void belford(int src,int n,vector<int> &dis){
     dis[src]=0;
     for(int i=0;i<n;i++){
@@ -118,5 +136,28 @@ int main(){
     }
   }
   cout<<"Maximal Strongly Connected Sub-Network has "<<max_ele<<" members and the members are : "<<fans<<endl;    
-  
+  //Typically a network failiures occurs when the link between two nodes is broken. This coerces the whole system to reset the rerouting tables.
+  //Link Failiure is usually prevented by setting a node that continuously sends validation packets to it's neighbours and awaits acknowledgement.
+  //If acknowledgement isn't received then, in terms of graph theory, the edge between the two "routers"/"nodes" is removed and the shortest distance is 
+  //recalculated via Bellmann Ford Algorithm.
+  cout<<"Enter link between two nodes to be killed"<<endl;
+  int node1,node2;
+  cin>>node1>>node2;
+  removeEdge(node1,node2);
+   for(int i=1;i<=n;i++){
+        vector<int> dis(n+1,10000);
+        belford(i,connections*2,dis);
+        for(int j=1;j<=n;j++){
+            global[i][j]=dis[j];
+        }
+    }
+    cout<<"Global view after killing the link : "<<endl;
+    for(int i=1;i<=n;i++){
+        cout<<i<<" -> ";
+        for(int j=1;j<=n;j++){
+            cout<<global[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+            cout<<"____________________________________________________"<<endl;
 }
