@@ -1,9 +1,11 @@
+//Contributions Handled : Graph Theory : Maahir Sharma
 //Functionalities as of now:
 //1) Setting up Router Networks with Edges
 //2) Calculation of Routing Tables via Bellmann Ford Algorithm in O(N^2);
 //3) Finding the Maximal Strongly Connected Sub Network.
 //4) Handling Link Failiure of between any two network routers with a direct edge.
 //5) Added Link State Packet and Flooding Feature so that when flood occurs each router has access to LSP of the flood initiator.
+
 #include<bits/stdc++.h>
 
 using namespace std;
