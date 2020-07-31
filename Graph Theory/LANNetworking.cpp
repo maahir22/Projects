@@ -2,9 +2,11 @@
 //Functionalities as of now:
 //1) Setting up Router Networks with Edges
 //2) Calculation of Routing Tables via Bellmann Ford Algorithm in O(N^2);
-//3) Finding the Maximal Strongly Connected Sub Network.
+//3) Finding the Maximal Strongly Connected Sub Network via KosaRaju Algorithm.
 //4) Handling Link Failiure of between any two network routers with a direct edge.
 //5) Added Link State Packet and Flooding Feature so that when flood occurs each router has access to LSP of the flood initiator.
+/*6) Added Optimal Cell Tower Placement Map is likened to a color,(channel–colors are limited to four), and found where to economically position broadcast towers 
+     for maximum coverage via Four Color Map Problem || Vizing's theorem (Referenced) */
 
 #include<bits/stdc++.h>
 
@@ -90,9 +92,32 @@ void lspdfs(int src, vector< int > lg[]){
         }
     }
 }
+void EdgeColor(int ed[][3], int e) {
+   int i, c, j;
+   for(i = 0; i < e; i++) {
+      c = 1; //Assign color to current edge 1 initially.
+      // If the same color is occupied by any of the adjacent edges,
+      // then discard this color and go to flag again and try next color.
+      flag:
+      ed[i][2] = c;
+      for(j = 0; j < e; j++) {
+         if(j == i)
+         continue;
+         if(ed[j][0] == ed[i][0] || ed[j][0] == ed[i][1] || ed[j][1] == ed[i][0] || ed[j][1] == ed[i][1]) {
+            if(ed[j][2] == ed[i][2]) {
+               c++;
+               goto flag;
+            }
+         }
+      }
+   }
+}
 int main() {
   int routers, connections;
-  cin >> routers >> connections;
+  cout<<"Enter number of Routers"<<endl;
+  cin >> routers;
+  cout<<"Enter number of Connections"<<endl;
+  cin >> connections;
   vector < int > graph[routers + 1];
   vector < int > lg [ routers + 1 ];
   vector< RFGraph > ls(routers + 1);
@@ -242,4 +267,43 @@ int main() {
        }
          cout<<" Flood received from "<<ls[i].packet.nodeid<<" @ Node : "<<i<<endl;   //Details of which Node has received the packet from initiator.
    }
+   /*____________________________________________________________________________________________________________________________________________*/
+    /*The next section deals with Cell Tower Placement Plan*/
+    //We need to handle the following section carefully : 
+    /*Allocation of a different channel in the spots where
+    channel overlap occurs (marked in color). In analogy,
+    colors must be different, so that cell phone signals are
+    handed off to a different channel.*/
+   int i, ni, e, j, max = -1;
+   cout<<"Enter the number of towers to be placed on the map: ";
+   cin>>ni;
+   cout<<"Enter the number of links between these towers: ";
+   cin>>e;
+   int ed[e][3], deg[ni+1] = {0};
+   for(i = 0; i < e; i++) {
+      cout<<"\nEnter the vertex pair for tower "<<i+1;
+      cout<<"\nN(1): ";
+      cin>>ed[i][0];
+      cout<<"N(2): ";
+      cin>>ed[i][1];
+      //calculate the degree of each vertex
+      ed[i][2] = -1;
+      deg[ed[i][0]]++;
+      deg[ed[i][1]]++;
+   }
+   //find out the maximum degree.
+   for(i = 1; i <= ni; i++) {
+      if(max < deg[i])
+      max = deg[i];
+   }
+   EdgeColor(ed , e);
+   cout<<"\nAccording to Vizing's theorem this tower graph can use maximum of "<<max+1<<" colors to generate a valid edge coloring.\n";
+   for(i = 0; i < e; i++)
+   cout<<"\nThe color of the edge between Tower N(1):"<<ed[i][0]<<" and Tower N(2):"<<ed[i][1]<<" is: color"<<ed[i][2]<<".";
+   /*Each cell region therefore uses one control tower with a
+    specific channel and the region or control tower adjacent to it
+    will use another tower and another channel. It is not hard to see
+    how by using 4 channels, a node coloring algorithm can be
+    used to efficiently plan towers and channels in a mobile
+    network*/
 }
