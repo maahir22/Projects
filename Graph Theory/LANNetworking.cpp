@@ -24,11 +24,11 @@ struct Edges {
 struct LSP{
     int nodeid=-1;
     vector<int> neighbours;
-    int timelive;
+    int sequence=1;
     LSP(int nodeid, vector<int> chk, int tt){
         this->nodeid=nodeid;
         neighbours=chk;
-        timelive=tt;
+        sequence=tt;
     }
     LSP(){}
 };
@@ -216,24 +216,30 @@ int main() {
   vector<int> neighbours(0);
   for(int j=0;j<lg[lspnode].size();j++)
     neighbours.push_back(lg[lspnode][j]);
-   LSP obj={lspnode,neighbours,20};
+   LSP obj={lspnode,neighbours,1};
    cout<<"Node Id : "<<obj.nodeid<<endl;
-   cout<<"Time Live(Default) : "<<obj.timelive<<endl;
+   cout<<"Sequence Number (Default) : "<<obj.sequence<<endl;
    cout<<"Neighbours : ";
    for(int i=0;i<obj.neighbours.size();i++){
        cout<<obj.neighbours[i]<<" ";
    }
-   cout<<endl;
-  
+   cout<<endl;                                                                  
    lspdfs(lspnode,lg);
+   //Giving Node 2 a Node ID which is greater than 3, this will imply that Node 2 has received a more recent flood from node 3 with greater sequence.
+   //Hence , it will not update it's LSP to the flood recieved from Node 1.
+   ls[2].packet.nodeid=3;
+   ls[2].packet.sequence=4;
    for(int i=1;i<=n;i++){
        if(cvis[i]){
-              if(ls[i].packet.nodeid==-1 || ls[i].packet.nodeid>lspnode ) //To replace the second condition of NodeId with Sequence Number.
+              if(ls[i].packet.nodeid==-1 || ls[i].packet.sequence < obj.sequence ) //To replace the second condition of NodeId with Sequence Number.
                ls[i].packet = obj;
        }
    }
    cout<<"Flooding successful displaying details"<<endl;
    for(int i=1;i<=n;i++){
+       if(ls[i].packet.nodeid!=obj.nodeid){
+           continue;
+       }
          cout<<" Flood received from "<<ls[i].packet.nodeid<<" @ Node : "<<i<<endl;   //Details of which Node has received the packet from initiator.
    }
 }
